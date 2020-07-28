@@ -30,24 +30,24 @@ namespace {
 
     public:
         CCLInitialize() {
-            int rc = nagra_cma_platf_init();
-            if ( rc == NAGRA_CMA_PLATF_OK ) {
+           // int rc = nagra_cma_platf_init();
+            //if ( rc == NAGRA_CMA_PLATF_OK ) {
                 bool result = nvInitialize();
                 if ( result == false ) {
                     REPORT("Call to nvInitialize failed");
                 }
-            } else {
-                REPORT_EXT("Call to nagra_cma_platf_init failed (%d)", rc);
-            }
+            //} else {
+               // REPORT_EXT("Call to nagra_cma_platf_init failed (%d)", rc);
+            //}
         }
 
         ~CCLInitialize() {
             REPORT("Calling nvTerminate");
             nvTerminate();
-            int rc = nagra_cma_platf_term();
+            /* int rc = nagra_cma_platf_term();
             if ( rc != NAGRA_CMA_PLATF_OK ) {
                 REPORT_EXT("Call to nagra_cma_platf_term failed (%d)", rc);
-            }
+            }*/
         }
 
     };

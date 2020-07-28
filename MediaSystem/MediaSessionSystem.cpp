@@ -897,9 +897,9 @@ CDMi_RESULT MediaSessionSystem::ReleaseClearContent(const uint8_t*, uint32_t, co
 
     g_lock.Lock(); // note:we could use a more find grained locking to only protect the _connectsessions
 
-    platStatus = nagra_cma_platf_dsm_open(TSID);
+   /*platStatus = nagra_cma_platf_dsm_open(TSID);
     REPORT_PRM_EXT(NAGRA_CMA_PLATF_OK, platStatus,
-                   "nagra_cma_platf_dsm_open", " tsid=%u", TSID);
+                   "nagra_cma_platf_dsm_open", " tsid=%u", TSID);*/
 
     uint32_t result = nvDsmOpen(&descramblingsession, _applicationSession, TSID, Emi);
     REPORT_DSM(result, "nvDsmOpen");
@@ -924,9 +924,9 @@ void MediaSessionSystem::CloseDescramblingSession(TNvSession session, const uint
         int platStatus;
         nvDsmClose(session);
 
-        platStatus = nagra_cma_platf_dsm_close(TSID);
+        /* platStatus = nagra_cma_platf_dsm_close(TSID);
         REPORT_PRM_EXT(NAGRA_CMA_PLATF_OK, platStatus,
-                       "nagra_cma_platf_dsm_close", " tsid=%u", TSID);
+                       "nagra_cma_platf_dsm_close", " tsid=%u", TSID); */
 
         _connectsessions.erase(it);
     }
@@ -942,9 +942,9 @@ void MediaSessionSystem::SetPrmContentMetadata(TNvSession descamblingsession, TN
 }
 
 void MediaSessionSystem::SetPlatformMetadata(TNvSession descamblingsession, const uint32_t TSID, uint8_t *data, size_t size) {
-    int result = nagra_cma_platf_dsm_cmd(TSID, data, size);
+   /* int result = nagra_cma_platf_dsm_cmd(TSID, data, size);
     REPORT_PRM_EXT(NAGRA_CMA_PLATF_OK, result,
-                   "nagra_cma_platf_dsm_cmd", " tsid=%u", TSID);
+                   "nagra_cma_platf_dsm_cmd", " tsid=%u", TSID); */
 }
 
 void MediaSessionSystem::Addref() const {

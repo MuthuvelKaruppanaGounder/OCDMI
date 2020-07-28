@@ -15,13 +15,13 @@
  */
 
 #include <core/core.h>
-
+#include "core/FileSystem.h"
 #include "OperatorVault.h"
 
 namespace CDMi {
 
 OperatorVault::OperatorVault(const string& path)
-    : _file(path) {
+    : _file(path, 0xFF) {
 }
 
 string OperatorVault::LoadOperatorVault() const {
