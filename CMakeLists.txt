@@ -23,7 +23,12 @@ find_package(WPEFramework REQUIRED)
 find_package(Core QUIET)
 find_package(Interfaces QUIET)
 
-include_directories(${CORE_INCLUDE_DIR} ${INTERFACES_INCLUDE_DIR})
+include_directories(${CORE_INCLUDE_DIR} 
+		    ${INTERFACES_INCLUDE_DIR}
+   		    ${CMAKE_SYSROOT}/usr/include/WPEFramework/
+		    ${CMAKE_SYSROOT}/
+		    ${CMAKE_SOURCE_DIR}/
+	     	   )
 
 add_subdirectory(MediaSystem)
-#add_subdirectory(MediaConnect)
+add_subdirectory(MediaConnect)

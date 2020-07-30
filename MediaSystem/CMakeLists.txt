@@ -54,16 +54,7 @@ set_target_properties(ocdm::ocdm PROPERTIES
   INTERFACE_INCLUDE_DIRECTORIES "${_IMPORT_PREFIX}/include/opencdm;${_IMPORT_PREFIX}/include/WPEFramework/ocdm"
   INTERFACE_LINK_LIBRARIES "WPEFrameworkCore::WPEFrameworkCore"
 )
-set(INCLUDE_DIR_PRIVATE
-        ${CMAKE_SYSROOT}/usr/include/WPEFramework/
-	${CMAKE_SYSROOT}/
-	${CMAKE_CURRENT_SOURCE_DIR}/ )
 
-
-include_directories( ${CMAKE_SYSROOT}/usr/include/WPEFramework/
-		 	${CMAKE_SYSROOT}/
-			${CMAKE_SOURCE_DIR}/
-	     	)
 
 # add the library
 add_library(${PROJECT_NAME} SHARED ${DRM_PLUGIN_SOURCES})
