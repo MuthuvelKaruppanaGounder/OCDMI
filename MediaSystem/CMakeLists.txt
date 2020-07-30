@@ -25,7 +25,7 @@ set(DRM_PLUGIN_SOURCES
 
 find_package(Nagra QUIET)
 find_package(WPEFramework QUIET)
-find_package(ocdm REQUIRED)
+#find_package(ocdm REQUIRED)
 include(interfaces OPTIONAL )
 include(plugins OPTIONAL )
 include(WPEFramework OPTIONAL )
@@ -49,11 +49,6 @@ message(WARNING "Yacto Values: WORKDIR: ${WORKDIR}, TOPDIR= ${TOPDIR}, STAGING_D
 
 # Create imported target ocdm::ocdm
 #add_library(ocdm::ocdm SHARED IMPORTED)
-
-set_target_properties(ocdm::ocdm PROPERTIES
-  INTERFACE_INCLUDE_DIRECTORIES "${_IMPORT_PREFIX}/include/opencdm;${_IMPORT_PREFIX}/include/WPEFramework/ocdm"
-  INTERFACE_LINK_LIBRARIES "WPEFrameworkCore::WPEFrameworkCore"
-)
 
 
 # add the library
