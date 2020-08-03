@@ -185,10 +185,20 @@ void MediaSessionSystem::MediaSessionSystemProxy::Run(const IMediaKeySessionCall
     g_lock.Unlock();
 } 
 
+TNvSession MediaSessionSystem::GetMediaSessionSystemAsmId()
+{
+    MediaSessionSystem* system = nullptr;
+
+    ASSERT(g_MediaSessionSystems.empty() == false);
+    system = g_MediaSessionSystems.front().second;
+    return system->_applicationSession;
+}
 
 /* static */ IMediaKeySession* MediaSessionSystem::CreateMediaSessionSystem(const uint8_t *f_pbInitData, const uint32_t f_cbInitData, const std::string& defaultoperatorvault, const std::string& licensepath) {
         TRACE_L1("Create MediaSessionSystem called");
 
+    /* Always add MediaSessionSystemProxy but not MediaSessionSystem. The list of proxies sharing the single MediaSessionSystem is registered and  kept under a list 
+      MediaSessionSystem is a thread specific to an asm, provisionsession and opvault*/
     return new MediaSessionSystem::MediaSessionSystemProxy( AddMediaSessionInstance(f_pbInitData, f_cbInitData, defaultoperatorvault, licensepath) );
 }
 
@@ -431,6 +441,8 @@ void MediaSessionSystem::OnDeliverySessionCompleted(const TNvSession deliverySes
 
 void MediaSessionSystem::GetFilters(FilterStorage& filters) {
     filters.clear();
+
+#ifdef INBAND_MESSAGE_SESSION
     if( _applicationSession != 0 ) {
         uint8_t numberOfFilters = 0;
         uint32_t result = nvImsmGetFilters(_applicationSession, nullptr, &numberOfFilters);
@@ -448,6 +460,7 @@ void MediaSessionSystem::GetFilters(FilterStorage& filters) {
 
         }
     }
+#endif
 }
 
 void MediaSessionSystem::GetProvisionChallenge(DataBuffer& buffer) {
@@ -604,11 +617,12 @@ void MediaSessionSystem::InitializeWhenProvisoned() {
     REPORT_ASM(result, "nvAsmSetOnRenewalListener");
     result = nvAsmSetOnNeedKeyListener(_applicationSession, OnNeedKey);
     REPORT_ASM(result, "nvAsmSetOnNeedKeyListener");
+#ifdef INBAND_MESSAGE_SESSION
     if( _inbandSession == 0 ) {
         result = nvImsmOpen(&_inbandSession, _applicationSession);
         REPORT_IMSM(result, "nvImsmOpen");
     }
-
+#endif
     result = nvAsmUseStorage(_applicationSession, const_cast<char *>(_licensepath.c_str()));
     REPORT_ASM(result, "nvAsmUseStorage");
 
@@ -640,6 +654,8 @@ void MediaSessionSystem::HandleFilters(IMediaKeySessionCallback* callback) {
             }
             else { // in this case we already sent the filters to the previous registering callbacks, now only update the new one
                 //as we are doing this on another thread at a later moment let's check if the callback is still registered
+
+                /* Call the only matching proxy againgt the given callback */
                 auto it = std::find_if(_systemproxies.begin(), _systemproxies.end(), [=](const MediaSessionSystemProxy* proxy){ return (proxy == nullptr ? false : proxy->IMediaKeyCallback() == callback); } );
                 if( it != _systemproxies.end()) {
                     callback->OnKeyMessage(data.data(), data.size(), const_cast<char*>("FILTERS"));
@@ -656,7 +672,9 @@ MediaSessionSystem::MediaSessionSystem(const uint8_t *data, const uint32_t lengt
     : _sessionId(g_NAGRASessionIDPrefix)
     , _requests(Request::NONE)
     , _applicationSession(0)
+#ifdef INBAND_MESSAGE_SESSION
     , _inbandSession(0) 
+#endif
  //   , _needKeySessions()
     , _renewalSession(0)
     , _provioningSession(0)
@@ -711,9 +729,11 @@ MediaSessionSystem::~MediaSessionSystem() {
 
     // note will correctly handle if InitializeWhenProvisoned() was never called
 
+#ifdef INBAND_MESSAGE_SESSION
     if( _inbandSession != 0 ) {
         nvImsmClose(_inbandSession);
     }
+#endif
 
     CloseProvisioningSession();
 
@@ -805,6 +825,7 @@ void MediaSessionSystem::Update(const uint8_t *data, uint32_t  length) {
             REPORT_LDS(result, "nvLdsImportMessage");
             break;
         }
+#ifdef INBAND_MESSAGE_SESSION
         case Request::EMMDELIVERY:
         {
             REPORT("NagraSytem importing EMM response");
@@ -819,6 +840,7 @@ void MediaSessionSystem::Update(const uint8_t *data, uint32_t  length) {
             reader.UnlockBuffer(buf.size);
             break;
         }
+#endif
         case Request::PROVISION:
         {
             REPORT("NagraSytem importing provsioning response");

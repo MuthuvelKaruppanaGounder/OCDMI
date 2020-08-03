@@ -140,6 +140,7 @@ public:
 
     static IMediaKeySession* CreateMediaSessionSystem(const uint8_t *f_pbInitData, const uint32_t f_cbInitData, const std::string& defaultoperatorvault, const std::string& licensepath);
     static void DestroyMediaSessionSystem(IMediaKeySession* session);
+    static TNvSession GetMediaSessionSystemAsmId();
 
     // IMediaSessionSystem overrides
     void Run(IMediaKeySessionCallback& callback);
@@ -199,6 +200,7 @@ private:
     using ConnectSessionStorage = std::map<TNvSession, IMediaSessionConnect*>;
     using DeliverySessionsStorage = std::set<TNvSession>;
     using MediaSessionSystemProxyStorage = std::forward_list<MediaSessionSystemProxy*>;
+    TNvSession _applicationSession;
 
     static bool OnRenewal(TNvSession appSession);
     static bool OnNeedKey(TNvSession appSession, TNvSession descramblingSession, TNvKeyStatus keyStatus,  TNvBuffer* content, TNvStreamType streamtype);
@@ -266,7 +268,6 @@ private:
 
     std::string _sessionId;
     Request _requests;
-    TNvSession _applicationSession;
     TNvSession  _inbandSession;
  //   DeliverySessionsStorage _needKeySessions; At the moment is seems that one delivery session is a correct implementation. As we have not been able to fully test yet if this works in all usage patterns we leave the code to have more in place for now
     TNvSession  _renewalSession; // if we do not need the _needKeySessions we should rename this deliverySession
